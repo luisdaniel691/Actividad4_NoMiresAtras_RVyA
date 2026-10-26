@@ -1,0 +1,14 @@
+{
+  "name": "NO MIRES ATRÁS — Horror AR",
+  "short_name": "No mires atrás",
+  "description": "Videojuego de horror móvil de realidad aumentada sin marcadores.",
+  "lang": "es-MX",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#08090d",
+  "theme_color": "#08090d",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "assets/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

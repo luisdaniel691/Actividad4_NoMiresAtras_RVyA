@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
+  <meta name="theme-color" content="#08090d">
+  <meta name="description" content="No mires atrás: videojuego móvil de realidad aumentada sin marcadores.">
+  <title>NO MIRES ATRÁS — Horror AR</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js"
+      }
+    }
+  </script>
+</head>
+<body>
+  <main id="app" aria-label="No mires atrás, juego de horror en realidad aumentada">
+    <video id="cameraFallback" class="camera-fallback" autoplay muted playsinline aria-hidden="true"></video>
+    <div id="gameRoot" aria-hidden="true"></div>
+
+    <div id="uiRoot">
+      <section id="menuScreen" class="screen screen-menu">
+        <div class="brand-mark"><span class="brand-dot"></span> PROYECTO 04 <span class="brand-line"></span> HORROR AR</div>
+        <div class="menu-title-wrap">
+          <p class="overline">NO TODO LO QUE TE SIGUE ESTÁ A LA VISTA</p>
+          <h1>NO MIRES<br><em>ATRÁS</em></h1>
+          <div class="title-scratch" aria-hidden="true"></div>
+          <p class="subtitle">Encuentra las tres llaves. No le quites los ojos de encima.</p>
+        </div>
+        <div class="menu-actions">
+          <button id="startButton" class="btn btn-primary" type="button"><span class="btn-symbol">▶</span> INICIAR</button>
+          <button id="instructionsButton" class="btn btn-secondary" type="button"><span class="btn-symbol">?</span> INSTRUCCIONES</button>
+        </div>
+        <div class="menu-foot"><span>3 NIVELES · 1 ESCAPE</span><span class="pulse-label"><i></i> OBSERVA. BUSCA. SOBREVIVE.</span></div>
+      </section>
+
+      <section id="instructionsScreen" class="screen screen-instructions hidden" aria-labelledby="instructionsTitle">
+        <div class="screen-topline"><span class="mini-mark">N/A</span><span>MANUAL DE SUPERVIVENCIA</span></div>
+        <h2 id="instructionsTitle">REGLAS PARA<br><em>SEGUIR VIVO</em></h2>
+        <div class="instruction-list">
+          <article class="instruction-card"><span class="instruction-number">01</span><div><h3>NO LO MIRES, NO AVANZA</h3><p>El monstruo se queda quieto mientras lo tienes dentro de la cámara. Cuando sales de su campo de visión, se acerca. Si te alcanza, pierdes.</p></div></article>
+          <article class="instruction-card"><span class="instruction-number">02</span><div><h3>ENCUENTRA 3 LLAVES</h3><p>Busca los tres símbolos dorados repartidos por el espacio. Toca el objeto brillante o céntralo en el círculo y pulsa RECOGER. Tienes un tiempo límite por nivel.</p></div></article>
+          <article class="instruction-card"><span class="instruction-number">03</span><div><h3>ARMA Y MUNICIÓN</h3><p>La pistola y las cajas de balas son ayudas opcionales. Recoge el arma y después la munición; apunta al monstruo y pulsa DISPARAR para hacerlo retroceder. Las balas escasean.</p></div></article>
+          <article class="instruction-card"><span class="instruction-number">04</span><div><h3>CADA NIVEL ES PEOR</h3><p>El tiempo disminuye, hay menos munición y el monstruo acelera. El nivel 4 presenta dos amenazas: es un adelanto de la Parte II.</p></div></article>
+        </div>
+        <div class="safety-note"><span>!</span><p>Juega en un área despejada. No corras ni camines hacia atrás mirando la pantalla. Detente si hay personas, muebles, escaleras o tráfico cerca.</p></div>
+        <div class="instructions-actions"><button id="backButton" class="btn btn-secondary" type="button">← VOLVER</button><button id="startFromInstructions" class="btn btn-primary" type="button">ENTENDIDO · INICIAR</button></div>
+      </section>
+
+      <section id="scanScreen" class="screen screen-scan hidden" aria-live="polite">
+        <div class="scan-top"><span class="mini-mark">N/A</span><span id="modeLabel">RA SIN MARCADORES</span></div>
+        <div class="scan-copy"><span class="scan-icon">⌖</span><h2 id="scanTitle">BUSCANDO<br>SUPERFICIE</h2><p id="scanDescription">Mueve el teléfono despacio y apunta al suelo para detectar la altura. La arena quedará centrada bajo tu posición; pulsa “Colocar arena” para empezar.</p></div>
+        <div class="scan-bottom"><div class="scan-hint"><i class="scan-pulse"></i><span id="scanStatus">ESCANEA EL ENTORNO</span></div><button id="placeArenaButton" class="btn btn-primary" type="button" disabled>COLOCAR ARENA</button><button id="simulationButton" class="text-button hidden" type="button">Probar en modo simulación</button></div>
+      </section>
+
+      <section id="gameHud" class="hud hidden" aria-live="polite">
+        <div class="hud-top">
+          <div class="level-block"><span id="hudLevelCaption">NIVEL 01</span><strong id="hudLevelName">EL PRIMER RASTRO</strong></div>
+          <div class="timer-block"><span>TIEMPO</span><strong id="timerValue">01:15</strong></div>
+          <button id="pauseButton" class="hud-icon-button" type="button" aria-label="Pausar partida">Ⅱ</button>
+        </div>
+        <div class="progress-track"><div id="timeProgress" class="progress-fill"></div></div>
+        <div class="hud-objectives">
+          <div class="objective"><span class="objective-icon key-icon">✦</span><span class="objective-label">LLAVES</span><strong id="keyCount">0/3</strong></div>
+          <div class="objective"><span class="objective-icon weapon-icon">⌁</span><span class="objective-label">ARMA</span><strong id="weaponStatus">NO</strong></div>
+          <div class="objective"><span class="objective-icon ammo-icon">▤</span><span class="objective-label">BALAS</span><strong id="ammoCount">0</strong></div>
+        </div>
+        <div class="center-reticle" aria-hidden="true"><span></span></div>
+        <div id="gameToast" class="game-toast" role="status"></div>
+        <div class="hud-bottom">
+          <div class="movement-pad" id="movementPad" aria-label="Controles de movimiento para modo simulación">
+            <button data-move="forward" class="move-button move-up" type="button" aria-label="Avanzar">▲</button>
+            <button data-move="left" class="move-button move-left" type="button" aria-label="Mover a la izquierda">◀</button>
+            <button data-move="back" class="move-button move-down" type="button" aria-label="Retroceder">▼</button>
+            <button data-move="right" class="move-button move-right" type="button" aria-label="Mover a la derecha">▶</button>
+          </div>
+          <div class="action-stack"><p id="interactionHint">Toca el objeto o céntralo y pulsa RECOGER</p><button id="pickupButton" class="pickup-button" type="button"><span>✦</span> RECOGER</button><button id="fireButton" class="fire-button" type="button"><span>✹</span> DISPARAR <small id="fireSubtext">ARMA NO ENCONTRADA</small></button></div>
+        </div>
+        <div id="modeNotice" class="mode-notice hidden">MODO SIMULACIÓN · SIN CÁMARA AR</div>
+      </section>
+
+      <section id="pauseScreen" class="screen screen-modal hidden" role="dialog" aria-modal="true" aria-labelledby="pauseTitle">
+        <div class="modal-card"><span class="modal-symbol">Ⅱ</span><h2 id="pauseTitle">PARTIDA<br><em>EN PAUSA</em></h2><p>Respira. Revisa tu alrededor antes de continuar.</p><button id="resumeButton" class="btn btn-primary" type="button">CONTINUAR</button><button id="quitButton" class="btn btn-secondary" type="button">SALIR AL MENÚ</button></div>
+      </section>
+
+      <section id="gameOverScreen" class="screen screen-modal hidden" role="dialog" aria-modal="true" aria-labelledby="resultTitle">
+        <div class="modal-card result-card"><span id="resultSymbol" class="modal-symbol result-symbol">✕</span><p id="resultKicker" class="overline">FIN DE LA PARTIDA</p><h2 id="resultTitle">TE HA<br><em>ALCANZADO</em></h2><p id="resultDescription">Nunca debiste dejar de mirarlo.</p><div class="result-stats"><div><span>LLAVES</span><strong id="resultKeys">0/3</strong></div><div><span>NIVEL</span><strong id="resultLevel">01</strong></div></div><button id="retryButton" class="btn btn-primary" type="button">VOLVER A INTENTAR</button><button id="menuButton" class="btn btn-secondary" type="button">MENÚ PRINCIPAL</button></div>
+      </section>
+
+      <div id="levelBanner" class="level-banner hidden"><span id="bannerSmall">NIVEL 01</span><strong id="bannerTitle">EL PRIMER RASTRO</strong><p id="bannerSub">No apartes la mirada.</p></div>
+      <div id="screenFlash" class="screen-flash" aria-hidden="true"></div>
+    </div>
+  </main>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
